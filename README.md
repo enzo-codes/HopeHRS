@@ -1,3 +1,26 @@
+# Hope, Inc. Human Resource System (HRS)
+
+Welcome to the development repository for the Hope, Inc. Human Resource System (Hope HRS). This system is a 6-week capstone project for the BS Information Technology program at New Era University, built to manage core HR operations with role-based rights enforcement.
+
+---
+
+## 1. Project Structure & Branching Strategy
+
+The repository follows a strict Git flow. Direct pushes to `main` or `dev` are blocked by branch protection rules.
+
+```text
+  main  (Production releases only)
+   ▲
+   │ (Release PR, reviewed by all 5 members)
+  dev   (Integration and testing branch)
+   ▲
+   ├─► feat/feature-name    (Feature branches)
+   ├─► db/rls-module-name   (Database triggers and policies)
+   └─► chore/task-name      (Build, environment, or configuration)
+
+
+
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
