@@ -1,54 +1,59 @@
-import { useEffect, useState } from 'react';
-import { supabase } from './services/supabaseClient';
+//you will consolidate all the placeholders and the protection logic into your main entry point. 
+// This configuration ensures that unauthorized users are redirected to the login page while allowing authenticated users to 
+// access the HR modules.
 
+
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+// 1. Import the Guard Component
+import ProtectedRoute from './components/ProtectedRoute';
+
+// 2. Import all Page Placeholders
+import Dashboard from './pages/Dashboard';
+import Employees from './pages/Employees';
+import JobHistory from './pages/JobHistory';
+import Jobs from './pages/Jobs';
+import Departments from './pages/Departments';
+import Admin from './pages/Admin';
+import DeletedItems from './pages/DeletedItems';
+import Login from './pages/Login';
+import AuthCallback from './pages/AuthCallback';
+
+/**
+ * App Component
+ * Manages the routing hierarchy and session-based access control.
+ */
 function App() {
-  const [status, setStatus] = useState('Connecting to Hope HRS database...');
-  const [employeeData, setEmployeeData] = useState(null);
-
-  useEffect(() => {
-    async function testConnection() {
-      try {
-        // Querying the employee table from the HopeDB setup
-        const { data, error } = await supabase
-          .from('employee')
-          .select('*')
-          .limit(1);
-
-        if (error) {
-          setStatus(`Connection failed: ${error.message}`);
-          console.error('Supabase Error:', error);
-        } else {
-          setStatus('Connected successfully to Hope HRS database!');
-          setEmployeeData(data);
-          console.log('Data retrieved:', data);
-        }
-      } catch (err) {
-        setStatus('An unexpected error occurred. Check console for details.');
-        console.error('Error:', err);
-      }
-    }
-
-    testConnection();
-  }, []);
+  // MOCK SESSION: Set this to 'true' to view the app, or 'false' to test the redirect to /login.
+  // In Sprint 2, this will be replaced by your actual Supabase auth state.
+  const isAuthenticated = true; 
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 text-white p-6">
-      <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-lg p-6 shadow-xl text-center">
-        <h1 className="text-2xl font-bold tracking-tight mb-4">Hope HRS System</h1>
-        
-        <div className="inline-flex items-center space-x-2 bg-zinc-800/50 px-3 py-1 rounded-full text-sm text-zinc-300 border border-zinc-700 mb-6">
-          <span className={`h-2.5 w-2.5 rounded-full ${status.includes('successfully') ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-          <span>{status}</span>
-        </div>
+    <BrowserRouter>
+      <Routes>
+        {/* --- PUBLIC ROUTES --- */}q
+        <Route path="/login" element={<Login />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
-        {employeeData && (
-          <div className="w-full text-left bg-zinc-950 p-4 rounded border border-zinc-800 font-mono text-xs text-zinc-400 overflow-x-auto">
-            <p className="font-semibold text-zinc-200 mb-2">Sample Record fetched:</p>
-            <pre>{JSON.stringify(employeeData[0], null, 2)}</pre>
-          </div>
-        )}
-      </div>
-    </div>
+        {/* --- PROTECTED HR MODULES --- */}
+        {/* Everything inside this group requires 'isAuthenticated' to be true */}
+        <Route element={<ProtectedRoute isAllowed={isAuthenticated} />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/jobhistory" element={<JobHistory />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/departments" element={<Departments />} />
+          <Route path="/admin" element={<Admin />} />
+          
+          {/* Note: In Sprint 2, M4 will add extra logic here to block 'USER' from /deleted-items */}
+          <Route path="/deleted-items" element={<DeletedItems />} />
+        </Route>
+
+        {/* --- FALLBACKS --- */}
+        {/* Redirect any unknown URL to the dashboard (if logged in) or login page */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
