@@ -34,11 +34,46 @@ export function AuthProvider({ children }) {
     return () => subscription?.unsubscribe();
   }, []);
 
+  const signUp = async (email, password) => {
+    try {
+      setError(null);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to sign up';
+      setError(errorMessage);
+      return { data: null, error: err };
+    }
+  };
+
+  const signIn = async (email, password) => {
+    try {
+      setError(null);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      setUser(data.user);
+      return { data, error: null };
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to sign in';
+      setError(errorMessage);
+      return { data: null, error: err };
+    }
+  };
+
   const value = {
     user,
     loading,
     error,
     isAuthenticated: !!user,
+    signUp,
+    signIn,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
