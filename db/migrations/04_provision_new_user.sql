@@ -11,14 +11,20 @@ BEGIN
   INSERT INTO "user" (id, email, record_status)
   VALUES (NEW.id, NEW.email, 'INACTIVE');
 
-  -- For each module, create the junction row and assign all rights with has_right = 0.
+  -- For each module, create the junction row and assign view-only rights by default.
   FOR module_row IN SELECT mod_id FROM "Module" LOOP
     INSERT INTO user_module (user_id, mod_id)
     VALUES (NEW.id, module_row.mod_id)
     RETURNING um_id INTO new_um_id;
 
     INSERT INTO "UserModule_Rights" (um_id, right_id, has_right)
-    SELECT new_um_id, right_id, 0
+    SELECT
+      new_um_id,
+      right_id,
+      CASE
+        WHEN lower(right_name) LIKE '%view%' THEN 1
+        ELSE 0
+      END
     FROM "rights";
   END LOOP;
 

@@ -22,4 +22,4 @@ Bilang paghahanda sa Rights Enforcement, ginawa at ni-seed ang mga sumusunod na 
 
 ## 4. Initial Seeds
 * **SUPERADMIN Account**: Naka-provision na ang email na `jcesperanza@neu.edu.ph` na may access sa lahat ng 17 rights (value = 1).
-* **New user provisioning trigger**: A Supabase auth trigger inserts a new row into the application `user` table with `record_status = 'INACTIVE'`, then creates module/rights mappings with `has_right = 0` for all rights.
+* **New user provisioning trigger**: A Supabase auth trigger inserts a new row into the application `user` table with `record_status = 'INACTIVE'`, then creates module/rights mappings that grant only view-level rights by default while keeping other rights disabled.
