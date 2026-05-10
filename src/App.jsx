@@ -5,6 +5,9 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
+// Import AuthProvider
+import { AuthProvider } from './context/AuthContext';
+
 // 1. Import the Guard Component
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -24,36 +27,30 @@ import AuthCallback from './pages/AuthCallback';
  * Manages the routing hierarchy and session-based access control.
  */
 function App() {
-  // MOCK SESSION: Set this to 'true' to view the app, or 'false' to test the redirect to /login.
-  // In Sprint 2, this will be replaced by your actual Supabase auth state.
-  const isAuthenticated = true; 
-
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* --- PUBLIC ROUTES --- */}q
-        <Route path="/login" element={<Login />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* --- PUBLIC ROUTES --- */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
 
-        {/* --- PROTECTED HR MODULES --- */}
-        {/* Everything inside this group requires 'isAuthenticated' to be true */}
-        <Route element={<ProtectedRoute isAllowed={isAuthenticated} />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/employees" element={<Employees />} />
-          <Route path="/jobhistory" element={<JobHistory />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/departments" element={<Departments />} />
-          <Route path="/admin" element={<Admin />} />
-          
-          {/* Note: In Sprint 2, M4 will add extra logic here to block 'USER' from /deleted-items */}
-          <Route path="/deleted-items" element={<DeletedItems />} />
-        </Route>
+          {/* --- PROTECTED HR MODULES --- */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/employees" element={<Employees />} />
+            <Route path="/jobhistory" element={<JobHistory />} />
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/departments" element={<Departments />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/deleted-items" element={<DeletedItems />} />
+          </Route>
 
-        {/* --- FALLBACKS --- */}
-        {/* Redirect any unknown URL to the dashboard (if logged in) or login page */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* --- FALLBACKS --- */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
