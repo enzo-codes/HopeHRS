@@ -67,6 +67,38 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signInWithOAuth = async (provider = 'google') => {
+    try {
+      setError(null);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (err) {
+      const errorMessage = err.message || `Failed to sign in with ${provider}`;
+      setError(errorMessage);
+      return { data: null, error: err };
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      setError(null);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+      return { error: null };
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to sign out';
+      setError(errorMessage);
+      return { error: err };
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -74,6 +106,8 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     signUp,
     signIn,
+    signInWithOAuth,
+    signOut,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

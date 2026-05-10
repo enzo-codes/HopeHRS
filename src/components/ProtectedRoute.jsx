@@ -1,14 +1,21 @@
-//This component acts as a wrapper. It checks if a user is authenticated; if not, it redirects them to the login page. 
-// Since M4 (Rights & Auth) DEVELOPER is still working on the actual Supabase session logic, you can use a temporary boolean for now.
-//M4 You can change this based on the requirements for the deliverables
-
-
 import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ isAllowed, redirectPath = '/login' }) => {
-  if (!isAllowed) {
+const ProtectedRoute = ({ redirectPath = '/login' }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to={redirectPath} replace />;
   }
+
   return <Outlet />;
 };
 
