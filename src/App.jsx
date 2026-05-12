@@ -10,6 +10,7 @@ import { AuthProvider } from './context/AuthContext';
 import { UserRightsProvider } from './context/UserRightsContext';
 
 // 1. Import the Guard Component
+import AppShell from './components/AppShell';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // 2. Import all Page Placeholders
@@ -38,14 +39,18 @@ function App() {
             <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* --- PROTECTED HR MODULES --- */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/employees" element={<Employees />} />
-              <Route path="/jobhistory" element={<JobHistory />} />
-              <Route path="/jobs" element={<Jobs />} />
-              <Route path="/departments" element={<Departments />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/deleted-items" element={<DeletedItems />} />
+            <Route element={<AppShell />}>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/employees" element={<Employees />} />
+                <Route path="/jobhistory" element={<JobHistory />} />
+                <Route path="/jobs" element={<Jobs />} />
+                <Route path="/departments" element={<Departments />} />
+                <Route path="/admin" element={<Admin />} />
+              </Route>
+              <Route element={<ProtectedRoute requiredRight="DELETED_ITEMS" />}>
+                <Route path="/deleted-items" element={<DeletedItems />} />
+              </Route>
             </Route>
 
             {/* --- FALLBACKS --- */}
