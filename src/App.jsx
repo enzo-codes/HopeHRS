@@ -5,8 +5,9 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-// Import AuthProvider
+// Import AuthProvider and rights provider
 import { AuthProvider } from './context/AuthContext';
+import { UserRightsProvider } from './context/UserRightsContext';
 
 // 1. Import the Guard Component
 import ProtectedRoute from './components/ProtectedRoute';
@@ -29,27 +30,29 @@ import AuthCallback from './pages/AuthCallback';
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* --- PUBLIC ROUTES --- */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
+      <UserRightsProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* --- PUBLIC ROUTES --- */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
-          {/* --- PROTECTED HR MODULES --- */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/employees" element={<Employees />} />
-            <Route path="/jobhistory" element={<JobHistory />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/departments" element={<Departments />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/deleted-items" element={<DeletedItems />} />
-          </Route>
+            {/* --- PROTECTED HR MODULES --- */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/employees" element={<Employees />} />
+              <Route path="/jobhistory" element={<JobHistory />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/departments" element={<Departments />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/deleted-items" element={<DeletedItems />} />
+            </Route>
 
-          {/* --- FALLBACKS --- */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+            {/* --- FALLBACKS --- */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </UserRightsProvider>
     </AuthProvider>
   );
 }
