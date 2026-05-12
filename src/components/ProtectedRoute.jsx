@@ -2,8 +2,8 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRights } from '../context/UserRightsContext';
 
-const ProtectedRoute = ({ redirectPath = '/login', requiredRight }) => {
-  const { isAuthenticated, loading } = useAuth();
+const ProtectedRoute = ({ redirectPath = '/login', requiredRight, allowedTypes }) => {
+  const { isAuthenticated, loading, currentUser } = useAuth();
   const { hasRight, loadingRights } = useRights();
 
   if (loading || loadingRights) {
@@ -16,6 +16,10 @@ const ProtectedRoute = ({ redirectPath = '/login', requiredRight }) => {
 
   if (!isAuthenticated) {
     return <Navigate to={redirectPath} replace />;
+  }
+
+  if (allowedTypes && !allowedTypes.includes(currentUser?.user_type)) {
+    return <Navigate to="/employees" replace />;
   }
 
   if (requiredRight && !hasRight(requiredRight)) {
