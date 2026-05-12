@@ -1,6 +1,8 @@
+import { useAuth } from '../context/AuthContext';
 import { useRights } from '../context/UserRightsContext';
 
 export default function JobHistory() {
+  const { userType } = useAuth();
   const { hasRight, loadingRights } = useRights();
 
   return (
@@ -32,6 +34,12 @@ export default function JobHistory() {
           )}
         </div>
       )}
+
+      <div className="mt-8 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <p className="text-sm text-slate-600">
+          Stamp column is {userType === 'USER' ? 'hidden for USER accounts' : 'visible'}.
+        </p>
+      </div>
     </div>
   );
 }

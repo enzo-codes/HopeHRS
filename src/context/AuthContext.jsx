@@ -104,6 +104,7 @@ export function AuthProvider({ children }) {
     loading,
     error,
     isAuthenticated: !!user,
+    userType: user?.user_metadata?.user_type?.toUpperCase() || 'USER',
     signUp,
     signIn,
     signInWithOAuth,
