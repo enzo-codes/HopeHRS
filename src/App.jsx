@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
+import EmployeeDetail from './pages/EmployeeDetail';
 import JobHistory from './pages/JobHistory';
 import Jobs from './pages/Jobs';
 import Departments from './pages/Departments';
@@ -31,6 +32,7 @@ function App() {
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/employees" element={<Employees />} />
+                <Route path="/employees/:empno" element={<EmployeeDetail />} />
                 <Route path="/jobhistory" element={<JobHistory />} />
                 <Route path="/jobs" element={<Jobs />} />
                 <Route path="/departments" element={<Departments />} />
