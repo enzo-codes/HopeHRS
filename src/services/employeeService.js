@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient';
+import { supabase } from './supabaseClient';
 
 // Builds a stamp string for audit trail
 function makeStamp(action, userId) {
@@ -52,8 +52,6 @@ export async function updateEmployee(empno, updates, userId) {
 }
 
 // SOFT DELETE — sets record_status = 'INACTIVE'
-// The cascade trigger on Supabase will automatically set all jobHistory rows
-// for this employee to INACTIVE as well.
 export async function softDeleteEmployee(empno, userId) {
   const stamp = makeStamp('DEACTIVATED', userId);
   const { error } = await supabase
@@ -64,7 +62,6 @@ export async function softDeleteEmployee(empno, userId) {
 }
 
 // RECOVER — sets record_status = 'ACTIVE'
-// The cascade trigger will also restore all jobHistory rows for this employee.
 export async function recoverEmployee(empno, userId) {
   const stamp = makeStamp('REACTIVATED', userId);
   const { error } = await supabase

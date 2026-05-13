@@ -4,18 +4,39 @@ import { supabase } from '../services/supabaseClient';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser]       = useState(null);
+  const [userType, setUserType] = useState('USER');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
+
+  // Fetch the user_type from the application `user` table.
+  // user_metadata is set by Supabase Auth and does NOT contain user_type —
+  // that field lives in our own `user` table managed by the provision trigger.
+  const fetchUserType = async (userId) => {
+    if (!userId) {
+      setUserType('USER');
+      return;
+    }
+    const { data, error } = await supabase
+      .from('user')
+      .select('user_type')
+      .eq('id', userId)
+      .single();
+
+    if (error || !data?.user_type) {
+      setUserType('USER');
+    } else {
+      setUserType(data.user_type.toUpperCase());
+    }
+  };
 
   useEffect(() => {
     const getUser = async () => {
       try {
         setLoading(true);
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
+        await fetchUserType(user?.id);
       } catch (err) {
         setError(err.message || 'Failed to get user');
       } finally {
@@ -25,10 +46,10 @@ export function AuthProvider({ children }) {
 
     getUser();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const sessionUser = session?.user ?? null;
+      setUser(sessionUser);
+      await fetchUserType(sessionUser?.id);
     });
 
     return () => subscription?.unsubscribe();
@@ -37,10 +58,7 @@ export function AuthProvider({ children }) {
   const signUp = async (email, password) => {
     try {
       setError(null);
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       return { data, error: null };
     } catch (err) {
@@ -53,12 +71,10 @@ export function AuthProvider({ children }) {
   const signIn = async (email, password) => {
     try {
       setError(null);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       setUser(data.user);
+      await fetchUserType(data.user?.id);
       return { data, error: null };
     } catch (err) {
       const errorMessage = err.message || 'Failed to sign in';
@@ -72,9 +88,7 @@ export function AuthProvider({ children }) {
       setError(null);
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
       });
       if (error) throw error;
       return { data, error: null };
@@ -91,6 +105,7 @@ export function AuthProvider({ children }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setUser(null);
+      setUserType('USER');
       return { error: null };
     } catch (err) {
       const errorMessage = err.message || 'Failed to sign out';
@@ -101,10 +116,10 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
+    userType,
     loading,
     error,
     isAuthenticated: !!user,
-    userType: user?.user_metadata?.user_type?.toUpperCase() || 'USER',
     signUp,
     signIn,
     signInWithOAuth,
