@@ -4,12 +4,12 @@ import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 
 const sidebarLinks = [
-  { name: 'Employees', path: '/employees' },
-  { name: 'Job History', path: '/jobhistory' },
-  { name: 'Jobs', path: '/jobs' },
-  { name: 'Departments', path: '/departments' },
-  { name: 'Admin', path: '/admin', hideForUser: true },
-  { name: 'Deleted Items', path: '/deleted-items', hideForUser: true },
+  { name: 'Employees',     path: '/employees' },
+  { name: 'Job History',   path: '/jobhistory' },
+  { name: 'Jobs',          path: '/jobs' },
+  { name: 'Departments',   path: '/departments' },
+  { name: 'Admin',         path: '/admin',         adminOnly: true },
+  { name: 'Deleted Items', path: '/deleted-items', adminOnly: true },
 ];
 
 export default function AppShell() {
@@ -23,7 +23,7 @@ export default function AppShell() {
         <div className="p-6 font-bold text-xl border-b border-slate-800">HopeHRS</div>
         <nav className="mt-6 flex flex-col gap-2 px-4">
           {sidebarLinks
-            .filter((link) => !(link.hideForUser && !showAdminLinks))
+            .filter((link) => !(link.adminOnly && !showAdminLinks))
             .map((link) => (
               <Link key={link.path} to={link.path} className="p-3 hover:bg-slate-800 rounded-lg">
                 {isOpen ? link.name : link.name[0]}
