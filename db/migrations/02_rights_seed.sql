@@ -13,7 +13,7 @@ CREATE TABLE "Module" (
 
 CREATE TABLE "rights" (
     right_id serial PRIMARY KEY,
-    right_name text
+    right_name textgi
 );
 
 CREATE TABLE "user_module" (

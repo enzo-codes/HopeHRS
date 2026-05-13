@@ -1,15 +1,18 @@
--- Trigger to provision a new authenticated user into the application rights system.
--- New users are inserted into the application user table as INACTIVE and are assigned default module-right mappings.
+-- Drop existing trigger and function (if any)
+DROP TRIGGER IF EXISTS trigger_provision_new_user ON auth.users;
+DROP FUNCTION IF EXISTS provision_new_user();
 
+-- Trigger to provision a new authenticated user into the application rights system.
+-- New users are inserted as INACTIVE, USER type, and are assigned default module-right mappings.
 CREATE OR REPLACE FUNCTION provision_new_user()
 RETURNS trigger AS $$
 DECLARE
   new_um_id INTEGER;
   module_row RECORD;
 BEGIN
-  -- Insert the new application user record with INACTIVE status
-  INSERT INTO "user" (id, email, record_status)
-  VALUES (NEW.id, NEW.email, 'INACTIVE');
+  -- Insert the new application user record with INACTIVE status and USER type
+  INSERT INTO "user" (id, email, record_status, user_type)
+  VALUES (NEW.id, NEW.email, 'INACTIVE', 'USER');
 
   -- For each module, create the junction row and assign view-only rights by default.
   FOR module_row IN SELECT mod_id FROM "Module" LOOP
@@ -32,6 +35,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Attach trigger to auth.users table
 CREATE TRIGGER trigger_provision_new_user
 AFTER INSERT ON auth.users
 FOR EACH ROW
