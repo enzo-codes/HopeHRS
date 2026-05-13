@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRights } from '../context/UserRightsContext';
 import { getEmployees } from '../services/employeeService';
@@ -8,11 +9,12 @@ export default function Employees() {
   const { hasRight, loadingRights } = useRights();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const data = await getEmployees(userType); // uses service, handles ACTIVE filter
+        const data = await getEmployees(userType);
         setEmployees(data || []);
       } catch (err) {
         console.error(err);
@@ -21,7 +23,9 @@ export default function Employees() {
       }
     };
     fetchEmployees();
-  }, [userType]); // re-fetch if userType changes
+  }, [userType]);
+
+  const colSpan = userType !== 'USER' ? 7 : 6;
 
   return (
     <div className="p-8">
@@ -29,13 +33,19 @@ export default function Employees() {
 
       <div className="mt-6 flex flex-wrap gap-3">
         {hasRight('EMP_ADD') && (
-          <button className="rounded-lg bg-green-600 px-4 py-2 text-white">Add Employee</button>
+          <button className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+            Add Employee
+          </button>
         )}
         {hasRight('EMP_EDIT') && (
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-white">Edit Employee</button>
+          <button className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+            Edit Employee
+          </button>
         )}
         {hasRight('EMP_DEL') && (
-          <button className="rounded-lg bg-red-600 px-4 py-2 text-white">Delete Employee</button>
+          <button className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">
+            Delete Employee
+          </button>
         )}
       </div>
 
@@ -57,20 +67,25 @@ export default function Employees() {
           <tbody className="divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan={userType !== 'USER' ? 7 : 6} className="p-4 text-center text-gray-500">
+                <td colSpan={colSpan} className="p-4 text-center text-gray-500">
                   Loading...
                 </td>
               </tr>
             ) : employees.length === 0 ? (
               <tr>
-                <td colSpan={userType !== 'USER' ? 7 : 6} className="p-4 text-center text-gray-500">
+                <td colSpan={colSpan} className="p-4 text-center text-gray-500">
                   No records found.
                 </td>
               </tr>
             ) : (
               employees.map((emp) => (
-                <tr key={emp.empno} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm">{emp.empno}</td>
+                <tr
+                  key={emp.empno}
+                  onClick={() => navigate(`/employees/${emp.empno}`)}
+                  className="cursor-pointer hover:bg-blue-50"
+                  title="Click to view employee details"
+                >
+                  <td className="px-6 py-4 text-sm font-medium text-blue-600">{emp.empno}</td>
                   <td className="px-6 py-4 text-sm">{emp.lastname}</td>
                   <td className="px-6 py-4 text-sm">{emp.firstname}</td>
                   <td className="px-6 py-4 text-sm">{emp.gender}</td>
