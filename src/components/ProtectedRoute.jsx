@@ -18,7 +18,7 @@ const ProtectedRoute = ({ redirectPath = '/login', requiredRight, allowedTypes }
     return <Navigate to={redirectPath} replace />;
   }
 
-  if (allowedTypes && !allowedTypes.includes(currentUser?.user_type)) {
+  if (allowedTypes && !allowedTypes.includes(userType)) {
     return <Navigate to="/employees" replace />;
   }
 
