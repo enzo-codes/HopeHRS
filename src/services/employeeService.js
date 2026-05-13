@@ -21,6 +21,17 @@ export async function getEmployees(userType) {
   return data;
 }
 
+// GET all INACTIVE employees (for DeletedItemsPage — ADMIN/SUPERADMIN only)
+export async function getDeletedEmployees() {
+  const { data, error } = await supabase
+    .from('employee')
+    .select('empno, lastname, firstname, gender, birthdate, hiredate, sepDate, record_status, stamp')
+    .eq('record_status', 'INACTIVE')
+    .order('empno');
+  if (error) throw error;
+  return data;
+}
+
 // ADD a new employee
 export async function addEmployee(employeeData, userId) {
   const stamp = makeStamp('CREATED', userId);
