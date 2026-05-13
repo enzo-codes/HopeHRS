@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useRights } from '../context/UserRightsContext';
 
 const ProtectedRoute = ({ redirectPath = '/login', requiredRight, allowedTypes }) => {
-  const { isAuthenticated, loading, currentUser } = useAuth();
+  const { isAuthenticated, loading, userType } = useAuth();
   const { hasRight, loadingRights } = useRights();
 
   if (loading || loadingRights) {
