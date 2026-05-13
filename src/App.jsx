@@ -38,7 +38,6 @@ function App() {
                 <Route path="/departments" element={<Departments />} />
                 <Route path="/admin" element={<Admin />} />
               </Route>
-
               {/* ADMIN and SUPERADMIN only — USER gets redirected to /employees */}
               <Route element={<ProtectedRoute allowedTypes={['ADMIN', 'SUPERADMIN']} />}>
                 <Route path="/deleted-items" element={<DeletedItems />} />
